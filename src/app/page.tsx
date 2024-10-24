@@ -1,101 +1,273 @@
-import Image from "next/image";
+'use client'
 
-export default function Home() {
+import React, { useState } from "react"
+import { ArrowRight, BarChart3, Brain, Database, LineChart, Smartphone } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { LineChart as RechartsLineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+// Mock data for price predictions
+const mockPredictions = {
+  wheat: {
+    '1week': [
+      { date: '2024-03-01', price: 220 },
+      { date: '2024-03-02', price: 225 },
+      { date: '2024-03-03', price: 223 },
+      { date: '2024-03-04', price: 228 },
+      { date: '2024-03-05', price: 230 },
+      { date: '2024-03-06', price: 227 },
+      { date: '2024-03-07', price: 232 },
+    ],
+    '1month': [
+      { date: '2024-03-01', price: 220 },
+      { date: '2024-03-08', price: 225 },
+      { date: '2024-03-15', price: 230 },
+      { date: '2024-03-22', price: 228 },
+      { date: '2024-03-29', price: 235 },
+    ],
+    '3months': [
+      { date: '2024-03-01', price: 220 },
+      { date: '2024-04-01', price: 228 },
+      { date: '2024-05-01', price: 235 },
+      { date: '2024-06-01', price: 240 },
+    ],
+  },
+  corn: {
+    '1week': [
+      { date: '2024-03-01', price: 180 },
+      { date: '2024-03-02', price: 182 },
+      { date: '2024-03-03', price: 185 },
+      { date: '2024-03-04', price: 183 },
+      { date: '2024-03-05', price: 187 },
+      { date: '2024-03-06', price: 189 },
+      { date: '2024-03-07', price: 188 },
+    ],
+    '1month': [
+      { date: '2024-03-01', price: 180 },
+      { date: '2024-03-08', price: 185 },
+      { date: '2024-03-15', price: 188 },
+      { date: '2024-03-22', price: 192 },
+      { date: '2024-03-29', price: 195 },
+    ],
+    '3months': [
+      { date: '2024-03-01', price: 180 },
+      { date: '2024-04-01', price: 188 },
+      { date: '2024-05-01', price: 195 },
+      { date: '2024-06-01', price: 200 },
+    ],
+  },
+  soybeans: {
+    '1week': [
+      { date: '2024-03-01', price: 350 },
+      { date: '2024-03-02', price: 355 },
+      { date: '2024-03-03', price: 358 },
+      { date: '2024-03-04', price: 356 },
+      { date: '2024-03-05', price: 360 },
+      { date: '2024-03-06', price: 362 },
+      { date: '2024-03-07', price: 365 },
+    ],
+    '1month': [
+      { date: '2024-03-01', price: 350 },
+      { date: '2024-03-08', price: 358 },
+      { date: '2024-03-15', price: 365 },
+      { date: '2024-03-22', price: 370 },
+      { date: '2024-03-29', price: 375 },
+    ],
+    '3months': [
+      { date: '2024-03-01', price: 350 },
+      { date: '2024-04-01', price: 365 },
+      { date: '2024-05-01', price: 380 },
+      { date: '2024-06-01', price: 390 },
+    ],
+  },
+}
+
+export default function Component() {
+  const [selectedCrop, setSelectedCrop] = useState<string>("")
+  const [selectedTimeframe, setSelectedTimeframe] = useState<string>("")
+  const [predictionData, setPredictionData] = useState<Array<{ date: string; price: number }>>([])
+
+  const handleCropChange = (value: string) => {
+    setSelectedCrop(value)
+  }
+
+  const handleTimeframeChange = (value: string) => {
+    setSelectedTimeframe(value)
+  }
+
+  const handlePrediction = () => {
+    if (selectedCrop && selectedTimeframe) {
+      // In a real application, this would be an API call to the backend
+      const predictions = mockPredictions[selectedCrop as keyof typeof mockPredictions][selectedTimeframe as keyof typeof mockPredictions['wheat']]
+      setPredictionData(predictions)
+    }
+  }
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    <div className="container mx-auto p-6 space-y-8">
+      <h1 className="text-3xl font-bold text-center mb-8">AgriPredict: AI-Powered Agricultural Market Price Prediction</h1>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Data Collection</CardTitle>
+            <CardDescription>Gather relevant agricultural data</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ul className="list-disc pl-5 space-y-2">
+              <li>Historical price data</li>
+              <li>Weather patterns</li>
+              <li>Crop yield information</li>
+              <li>Market demand trends</li>
+              <li>Global trade data</li>
+            </ul>
+          </CardContent>
+        </Card>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+        <Card>
+          <CardHeader>
+            <CardTitle>Data Preprocessing</CardTitle>
+            <CardDescription>Clean and prepare data for analysis</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ul className="list-disc pl-5 space-y-2">
+              <li>Data cleaning and normalization</li>
+              <li>Feature engineering</li>
+              <li>Time series analysis</li>
+              <li>Handling missing values</li>
+            </ul>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>AI Model Development</CardTitle>
+            <CardDescription>Create and train predictive models</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ul className="list-disc pl-5 space-y-2">
+              <li>Machine learning algorithms</li>
+              <li>Deep learning neural networks</li>
+              <li>Time series forecasting models</li>
+              <li>Ensemble methods</li>
+            </ul>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Price Prediction</CardTitle>
+            <CardDescription>Generate market price forecasts</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ul className="list-disc pl-5 space-y-2">
+              <li>Short-term predictions (days/weeks)</li>
+              <li>Medium-term forecasts (months)</li>
+              <li>Long-term projections (seasons/years)</li>
+              <li>Confidence intervals</li>
+            </ul>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>User Interface</CardTitle>
+            <CardDescription>Intuitive dashboard for users</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ul className="list-disc pl-5 space-y-2">
+              <li>Interactive charts and graphs</li>
+              <li>Customizable reports</li>
+              <li>Mobile app integration</li>
+              <li>Alerts and notifications</li>
+            </ul>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Continuous Improvement</CardTitle>
+            <CardDescription>Enhance model accuracy over time</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ul className="list-disc pl-5 space-y-2">
+              <li>Regular model retraining</li>
+              <li>Feedback incorporation</li>
+              <li>Performance monitoring</li>
+              <li>Adaptation to market changes</li>
+            </ul>
+          </CardContent>
+        </Card>
+      </div>
+
+      <Card className="mt-8">
+        <CardHeader>
+          <CardTitle>Data Processing Pipeline</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-wrap justify-center items-center gap-4">
+            <Database className="w-12 h-12 text-blue-500" />
+            <ArrowRight className="w-6 h-6" />
+            <Brain className="w-12 h-12 text-green-500" />
+            <ArrowRight className="w-6 h-6" />
+            <BarChart3 className="w-12 h-12 text-purple-500" />
+            <ArrowRight className="w-6 h-6" />
+            <LineChart className="w-12 h-12 text-red-500" />
+            <ArrowRight className="w-6 h-6" />
+            <Smartphone className="w-12 h-12 text-yellow-500" />
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card className="mt-8">
+        <CardHeader>
+          <CardTitle>Price Prediction Demo</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <div className="flex gap-4">
+              <Select onValueChange={handleCropChange}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Select crop" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="wheat">Wheat</SelectItem>
+                  <SelectItem value="corn">Corn</SelectItem>
+                  <SelectItem value="soybeans">Soybeans</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select onValueChange={handleTimeframeChange}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Select timeframe" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="1week">1 Week</SelectItem>
+                  <SelectItem value="1month">1 Month</SelectItem>
+                  <SelectItem value="3months">3 Months</SelectItem>
+                </SelectContent>
+              </Select>
+              <Button onClick={handlePrediction}>Predict Price</Button>
+            </div>
+            <div className="h-64 bg-gray-100 rounded-lg">
+              {predictionData.length > 0 ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <RechartsLineChart data={predictionData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="date" />
+                    <YAxis />
+                    <Tooltip />
+                    <Line type="monotone" dataKey="price" stroke="#8884d8" />
+                  </RechartsLineChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="h-full flex items-center justify-center">
+                  <span className="text-gray-500">Select a crop and timeframe to see price predictions</span>
+                </div>
+              )}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
-  );
+  )
 }
